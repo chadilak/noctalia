@@ -20,7 +20,12 @@ namespace compositors::mango {
 
     bool launchedAny = false;
     for (const auto& connector : s_knownConnectors) {
-      if (runtime.dispatch((std::string(on ? "enable_monitor," : "disable_monitor,") + connector))) {
+      // sleep_monitor/wakeup_monitor toggle DPMS-style power only. The
+      // similarly-named enable_monitor/disable_monitor instead remove and
+      // re-add the output from mango's layout entirely, which drops any
+      // configured monitorrule position (x/y, transform) and can leave
+      // outputs re-placed in the wrong order on wake.
+      if (runtime.dispatch((std::string(on ? "wakeup_monitor," : "sleep_monitor,") + connector))) {
         launchedAny = true;
       }
     }
