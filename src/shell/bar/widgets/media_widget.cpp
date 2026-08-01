@@ -310,7 +310,8 @@ void MediaWidget::syncState(Renderer& renderer, const std::optional<MprisPlayerI
   }
 
   const bool playing = active.has_value() && active->playbackStatus == "Playing";
-  const bool showWidget = active.has_value() ? (!m_hideWhenIdle || playing) : !m_hideWhenNoMedia;
+  const bool hasMedia = active.has_value() && active->playbackStatus != "Stopped";
+  const bool showWidget = hasMedia ? (!m_hideWhenIdle || playing) : !m_hideWhenNoMedia;
   syncWidgetVisibility(showWidget);
   if (!showWidget) {
     applyTitleScrollMode(false);
