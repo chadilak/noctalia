@@ -346,7 +346,12 @@ namespace desktop_settings {
       albumArtBlur.visibleWhen = WidgetSettingVisibility{"album_art_background", {"true"}};
       add(std::move(albumArtBlur));
       add(boolSpec("audio_visualizer", false));
-      add(boolSpec("hide_when_no_media", false));
+      add(selectSpec(
+          "hide_when_no_media", "off",
+          {{"off", "settings.widgets.options.off"},
+           {"on", "settings.widgets.options.on"},
+           {"when_stopped", "settings.widgets.options.when-stopped"}}
+      ));
     } else if (type == "label") {
       add(stringSpec("title", "Title"));
       add(stringSpec("description"));

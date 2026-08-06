@@ -1029,6 +1029,63 @@ circular_avatar = true
     );
   }
 
+  void checkMediaHideWhenNoMediaModeMigration() {
+    toml::table config = toml::parse(R"toml(
+[desktop_widgets.widget.desk-music]
+type = "media_player"
+cx = 100.0
+cy = 200.0
+
+[desktop_widgets.widget.desk-music.settings]
+hide_when_no_media = true
+
+[desktop_widgets.widget.desk-music-b]
+type = "media_player"
+
+[desktop_widgets.widget.desk-music-b.settings]
+hide_when_no_media = false
+
+[desktop_widgets.widget.sticker.settings]
+hide_when_no_media = true
+
+[widget.music]
+type = "media"
+hide_when_no_media = false
+
+[widget.named-media]
+type = "media"
+hide_when_no_media = true
+
+[widget.clock]
+type = "clock"
+hide_when_no_media = true
+)toml");
+    noctalia::config::LegacyConfigIssues issues;
+    noctalia::config::normalizeLegacyConfig(config, issues);
+
+    TEST_CHECK(
+        config["desktop_widgets"]["widget"]["desk-music"]["settings"]["hide_when_no_media"].value<std::string>()
+            == std::optional<std::string>{"on"}
+        && config["desktop_widgets"]["widget"]["desk-music-b"]["settings"]["hide_when_no_media"].value<std::string>()
+            == std::optional<std::string>{"off"}
+    );
+    TEST_CHECK(
+        config["widget"]["music"]["hide_when_no_media"].value<std::string>() == std::optional<std::string>{"off"}
+        && config["widget"]["named-media"]["hide_when_no_media"].value<std::string>()
+            == std::optional<std::string>{"on"}
+    );
+    TEST_CHECK(
+        config["desktop_widgets"]["widget"]["sticker"]["settings"]["hide_when_no_media"].value<bool>()
+            == std::optional<bool>{true}
+        && config["widget"]["clock"]["hide_when_no_media"].value<bool>() == std::optional<bool>{true}
+    );
+    TEST_CHECK(issues.size() == 4);
+
+    noctalia::config::LegacyConfigIssues secondPassIssues;
+    noctalia::config::normalizeLegacyConfig(config, secondPassIssues);
+    TEST_CHECK(secondPassIssues.empty());
+  }
+
   void checkVersionGating() {
     toml::table legacy = toml::parse(R"(
 [bar.main]
@@ -1158,6 +1215,7 @@ int main() {
   checkPluginAutoUpdateModeMigration();
   checkAppIconColorizationMigration();
   checkCircularAvatarMigration();
+  checkMediaHideWhenNoMediaModeMigration();
   checkVersionGating();
   checkReminderFingerprint();
   checkRegistryOrdering();

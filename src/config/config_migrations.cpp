@@ -36,6 +36,7 @@ namespace noctalia::config {
     constexpr int kWorkspacesMonitorsMigrationVersion = 18;
     constexpr int kAppIconColorizationMigrationVersion = 19;
     constexpr int kCircularAvatarMigrationVersion = 20;
+    constexpr int kMediaHideWhenNoMediaModeMigrationVersion = 21;
     constexpr std::int64_t kMaxBarRadius = 500;
     constexpr std::array<std::string_view, 5> kBarRadiusKeys = {
         "radius", "radius_top_left", "radius_top_right", "radius_bottom_left", "radius_bottom_right",
@@ -813,6 +814,51 @@ namespace noctalia::config {
       });
     }
 
+    // `hide_when_no_media` was a bool on both the bar `media` widget and the desktop `media_player` widget. It
+    // changed to a string enum (off|on|when_stopped). Rewrite legacy booleans before they hit the enum-decoding
+    // schema, which only accepts strings/ints and would silently fall back to the default.
+    template <typename OnChanged> void migrateMediaHideWhenNoMediaMode(toml::table& root, OnChanged&& onChanged) {
+      const auto convertWidget = [&onChanged](toml::table& widget, std::string_view legacyKey, std::string path) {
+        const auto legacy = widget[legacyKey].value<bool>();
+        if (!legacy.has_value()) {
+          return;
+        }
+        widget.insert_or_assign(legacyKey, *legacy ? "on" : "off");
+        onChanged(path);
+      };
+
+      if (auto* widgets = root["widget"].as_table()) {
+        for (auto& [widgetName, widgetNode] : *widgets) {
+          auto* widget = widgetNode.as_table();
+          if (widget == nullptr || (*widget)["type"].value_or(std::string(widgetName.str())) != "media") {
+            continue;
+          }
+          convertWidget(*widget, "hide_when_no_media", "widget." + std::string(widgetName.str()));
+        }
+      }
+
+      if (auto* desktopWidgets = root["desktop_widgets"].as_table()) {
+        if (auto* widgets = (*desktopWidgets)["widget"].as_table()) {
+          for (auto& [widgetName, widgetNode] : *widgets) {
+            auto* widget = widgetNode.as_table();
+            if (widget == nullptr || (*widget)["type"].value_or(std::string(widgetName.str())) != "media_player") {
+              continue;
+            }
+            if (auto* settings = (*widget)["settings"].as_table()) {
+              convertWidget(*settings, "hide_when_no_media", "desktop_widgets.widget." + std::string(widgetName.str()));
+            }
+          }
+        }
+      }
+    }
+
+    void
+    migrateMediaHideWhenNoMediaModeSidecar(toml::table& root, const toml::table& /*base*/, schema::Diagnostics& diag) {
+      migrateMediaHideWhenNoMediaMode(root, [&diag](const std::string& path) {
+        diag.warn(path, "converted hide_when_no_media to the off/on/when_stopped modes");
+      });
+    }
+
     void migrateCustomButtonCommandsSidecar(toml::table& root, const toml::table& /*base*/, schema::Diagnostics& diag) {
       migrateCustomButtonCommands(root, [&diag](const std::string& path, std::string_view message) {
         diag.warn(path, std::string(message));
@@ -1168,6 +1214,11 @@ namespace noctalia::config {
             .summary = "shell: move circular_avatar from Control Center to shared avatar settings",
             .apply = migrateCircularAvatarSidecar,
         },
+        {
+            .toVersion = kMediaHideWhenNoMediaModeMigrationVersion,
+            .summary = "media widget: convert hide_when_no_media to off/on/when_stopped modes",
+            .apply = migrateMediaHideWhenNoMediaModeSidecar,
+        },
     };
     return migrations;
   }
@@ -1365,6 +1416,13 @@ namespace noctalia::config {
           .path = path,
           .message = keptCanonical ? "removed control_center.circular_avatar; kept existing shell.circular_avatar"
                                    : "control_center.circular_avatar moved to shell.circular_avatar",
+      });
+    });
+    migrateMediaHideWhenNoMediaMode(root, [&issues](const std::string& path) {
+      issues.push_back({
+          .migrationVersion = kMediaHideWhenNoMediaModeMigrationVersion,
+          .path = path,
+          .message = "hide_when_no_media is now off/on/when_stopped",
       });
     });
   }
