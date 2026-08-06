@@ -226,7 +226,7 @@ void MediaWidget::applyTitleScrollMode(bool titleVisible) {
 }
 
 void MediaWidget::syncWidgetVisibility(bool hasMedia) {
-  const bool showWidget = !m_hideWhenNoMedia || hasMedia;
+  const bool showWidget = m_hideWhenNoMedia == MediaHideMode::Off || hasMedia;
   if (Node* rootNode = root(); rootNode != nullptr) {
     if (rootNode->visible() != showWidget || rootNode->participatesInLayout() != showWidget) {
       rootNode->setVisible(showWidget);
@@ -279,9 +279,10 @@ void MediaWidget::syncState(Renderer& renderer, const std::optional<MprisPlayerI
     return;
   }
 
-  const bool hasMedia = active.has_value() && active->playbackStatus != "Stopped";
+  const bool stoppedCountsAsNoMedia = m_hideWhenNoMedia == MediaHideMode::WhenStopped;
+  const bool hasMedia = active.has_value() && (!stoppedCountsAsNoMedia || active->playbackStatus != "Stopped");
   syncWidgetVisibility(hasMedia);
-  if (m_hideWhenNoMedia && !hasMedia) {
+  if (m_hideWhenNoMedia != MediaHideMode::Off && !hasMedia) {
     applyTitleScrollMode(false);
     return;
   }
