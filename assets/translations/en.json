@@ -3302,6 +3302,8 @@
         "net-rx": "Network RX",
         "net-tx": "Network TX",
         "none": "None",
+        "off": "Off",
+        "on": "On",
         "on-hover": "On Hover",
         "output": "Output",
         "percent": "Percent",
@@ -3318,6 +3320,7 @@
         "text": "Text",
         "text-only": "Text Only",
         "time": "Time",
+        "when-stopped": "When Stopped",
         "workspace-label-centered": "Centered",
         "workspace-label-corner": "Corner",
         "workspace-label-inside": "Inside Pill"
@@ -3554,7 +3557,7 @@
           "label": "Hide When No Connected Device"
         },
         "hide-when-no-media": {
-          "description": "Hide the media widget when no MPRIS player is active",
+          "description": "Hide the media widget when there is no active player; When Stopped also hides when player is stopped",
           "label": "Hide When No Media"
         },
         "hide-when-no-unread": {

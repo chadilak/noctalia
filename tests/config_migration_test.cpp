@@ -779,6 +779,67 @@ German = "Clock"
     );
   }
 
+  void checkMediaHideWhenNoMediaModeMigration() {
+    toml::table config = toml::parse(R"toml(
+[desktop_widgets.widget.desk-music]
+type = "media_player"
+cx = 100.0
+cy = 200.0
+
+[desktop_widgets.widget.desk-music.settings]
+hide_when_no_media = true
+
+[desktop_widgets.widget.desk-music-b]
+type = "media_player"
+
+[desktop_widgets.widget.desk-music-b.settings]
+hide_when_no_media = false
+
+[desktop_widgets.widget.sticker.settings]
+hide_when_no_media = true
+
+[widget.music]
+type = "media"
+hide_when_no_media = false
+
+[widget.named-media]
+type = "media"
+hide_when_no_media = true
+
+[widget.clock]
+type = "clock"
+hide_when_no_media = true
+)toml");
+    noctalia::config::LegacyConfigIssues issues;
+    noctalia::config::normalizeLegacyConfig(config, issues);
+
+    expect(
+        config["desktop_widgets"]["widget"]["desk-music"]["settings"]["hide_when_no_media"].value<std::string>()
+                == std::optional<std::string>{"on"}
+            && config["desktop_widgets"]["widget"]["desk-music-b"]["settings"]["hide_when_no_media"]
+                    .value<std::string>()
+                == std::optional<std::string>{"off"},
+        "desktop media_player hide_when_no_media was not migrated to a mode string"
+    );
+    expect(
+        config["widget"]["music"]["hide_when_no_media"].value<std::string>() == std::optional<std::string>{"off"}
+            && config["widget"]["named-media"]["hide_when_no_media"].value<std::string>()
+                == std::optional<std::string>{"on"},
+        "media hide_when_no_media was not migrated to a mode string"
+    );
+    expect(
+        config["desktop_widgets"]["widget"]["sticker"]["settings"]["hide_when_no_media"].value<bool>()
+                == std::optional<bool>{true}
+            && config["widget"]["clock"]["hide_when_no_media"].value<bool>() == std::optional<bool>{true},
+        "a non-media widget was migrated as media"
+    );
+    expect(issues.size() == 4, "expected one migration issue per media_player/media widget");
+
+    noctalia::config::LegacyConfigIssues secondPassIssues;
+    noctalia::config::normalizeLegacyConfig(config, secondPassIssues);
+    expect(secondPassIssues.empty(), "hide_when_no_media normalization was not idempotent");
+  }
+
   void checkVersionGating() {
     toml::table legacy = toml::parse(R"(
 [bar.main]
@@ -929,6 +990,7 @@ int main() {
   checkKeyboardLayoutCustomLabelsMigration();
   checkWorkspacesDisplayMigration();
   checkPluginAutoUpdateModeMigration();
+  checkMediaHideWhenNoMediaModeMigration();
   checkVersionGating();
   checkReminderFingerprint();
   checkRegistryOrdering();

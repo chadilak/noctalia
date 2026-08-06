@@ -95,6 +95,23 @@ const noctalia::bar::WidgetDefinition<MediaWidget::Options>& mediaWidgetDefiniti
           }),
           field<&Options::hideWhenNoMedia>({
               .key = "hide_when_no_media",
+              .choices = {
+                  {
+                      .value = MediaHideMode::Off,
+                      .configValue = "off",
+                      .labelKey = "settings.widgets.options.off",
+                  },
+                  {
+                      .value = MediaHideMode::On,
+                      .configValue = "on",
+                      .labelKey = "settings.widgets.options.on",
+                  },
+                  {
+                      .value = MediaHideMode::WhenStopped,
+                      .configValue = "when_stopped",
+                      .labelKey = "settings.widgets.options.when-stopped",
+                  },
+              },
           }),
       },
   };
