@@ -315,7 +315,7 @@ std::unique_ptr<DesktopWidget> DesktopWidgetFactory::create(
             .vertical = getStringSetting(settings, "layout", "horizontal") == "vertical",
             .color = getColorSpecSetting(settings, "color", colorSpecFromRole(ColorRole::OnSurface)),
             .shadow = getBoolSetting(settings, "shadow", true),
-            .hideWhenNoMedia = getBoolSetting(settings, "hide_when_no_media", false),
+            .hideWhenNoMedia = mediaHideModeFromConfigValue(getStringSetting(settings, "hide_when_no_media", "off")),
             .albumArtBackground = getBoolSetting(settings, "album_art_background", false),
             .albumArtBlur = getIntSetting(settings, "album_art_blur", 24),
             .audioVisualizer = getBoolSetting(settings, "audio_visualizer", false),
