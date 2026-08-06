@@ -133,8 +133,8 @@ bool DesktopMediaPlayerWidget::applySetting(
     return false;
   }
   if (key == "hide_when_no_media") {
-    if (const auto* v = std::get_if<bool>(&value)) {
-      m_hideWhenNoMedia = *v;
+    if (const auto* v = std::get_if<std::string>(&value)) {
+      m_hideWhenNoMedia = mediaHideModeFromConfigValue(*v);
       if (applyVisibility()) {
         requestLayout();
       }
@@ -396,11 +396,18 @@ void DesktopMediaPlayerWidget::applyShadow() {
 }
 
 bool DesktopMediaPlayerWidget::hasActiveMedia() const {
-  return m_mpris != nullptr && m_mpris->activePlayer().has_value();
+  if (m_mpris == nullptr) {
+    return false;
+  }
+  const auto active = m_mpris->activePlayer();
+  if (!active.has_value()) {
+    return false;
+  }
+  return m_hideWhenNoMedia != MediaHideMode::WhenStopped || active->playbackStatus != "Stopped";
 }
 
 bool DesktopMediaPlayerWidget::shouldBeVisible() const {
-  return m_editorPreview || !m_hideWhenNoMedia || hasActiveMedia();
+  return m_editorPreview || m_hideWhenNoMedia == MediaHideMode::Off || hasActiveMedia();
 }
 
 bool DesktopMediaPlayerWidget::applyVisibility() {
