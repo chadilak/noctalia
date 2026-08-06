@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shell/desktop/desktop_widget.h"
+#include "shell/media_hide_mode.h"
 #include "ui/palette.h"
 
 #include <cstdint>
@@ -23,7 +24,7 @@ public:
     bool vertical = false;
     ColorSpec color = colorSpecFromRole(ColorRole::OnSurface);
     bool shadow = true;
-    bool hideWhenNoMedia = false;
+    MediaHideMode hideWhenNoMedia = MediaHideMode::Off;
     bool albumArtBackground = false;
     int albumArtBlur = 24;
     bool audioVisualizer = false;
@@ -69,7 +70,7 @@ private:
   bool m_vertical;
   ColorSpec m_color;
   bool m_shadow;
-  bool m_hideWhenNoMedia = false;
+  MediaHideMode m_hideWhenNoMedia = MediaHideMode::Off;
   bool m_albumArtBackground = false;
   int m_albumArtBlur = 24;
   bool m_audioVisualizerEnabled = false;
