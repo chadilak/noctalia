@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shell/desktop/desktop_widget.h"
+#include "shell/media_hide_mode.h"
 #include "ui/palette.h"
 
 #include <memory>
@@ -20,7 +21,7 @@ public:
     bool vertical = false;
     ColorSpec color = colorSpecFromRole(ColorRole::OnSurface);
     bool shadow = true;
-    bool hideWhenNoMedia = false;
+    MediaHideMode hideWhenNoMedia = MediaHideMode::Off;
   };
 
   DesktopMediaPlayerWidget(MprisService* mpris, HttpClient* httpClient, Options options);
@@ -53,7 +54,7 @@ private:
   bool m_vertical;
   ColorSpec m_color;
   bool m_shadow;
-  bool m_hideWhenNoMedia = false;
+  MediaHideMode m_hideWhenNoMedia = MediaHideMode::Off;
   bool m_editorPreview = false;
   bool m_visible = true;
   bool m_visibilityInitialized = false;
