@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shell/bar/widget.h"
+#include "shell/media_hide_mode.h"
 
 #include <cstdint>
 #include <memory>
@@ -30,7 +31,7 @@ public:
     int minWidth = 80;
     int artSize = 16;
     MediaTitleScrollMode titleScrollMode = MediaTitleScrollMode::None;
-    bool hideWhenNoMedia = false;
+    MediaHideMode hideWhenNoMedia = MediaHideMode::Off;
     bool albumArtOnly = false;
     bool hideAlbumArt = false;
     bool hideArtist = false;
@@ -55,7 +56,7 @@ private:
   float m_minWidth = 80.0F;
   float m_artSize = 16.0F;
   MediaTitleScrollMode m_titleScrollMode = MediaTitleScrollMode::None;
-  bool m_hideWhenNoMedia = false;
+  MediaHideMode m_hideWhenNoMedia = MediaHideMode::Off;
   bool m_albumArtOnly = false;
   bool m_hideAlbumArt = false;
   bool m_hideArtist = false;
