@@ -332,7 +332,12 @@ namespace desktop_settings {
       add(colorSpec("color", "on_surface"));
       add(fontFamilySpec());
       add(boolSpec("shadow", true));
-      add(boolSpec("hide_when_no_media", false));
+      add(selectSpec(
+          "hide_when_no_media", "off",
+          {{"off", "settings.widgets.options.off"},
+           {"on", "settings.widgets.options.on"},
+           {"when_stopped", "settings.widgets.options.when-stopped"}}
+      ));
     } else if (type == "label") {
       add(stringSpec("title", "Title"));
       add(stringSpec("description"));
