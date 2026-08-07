@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <optional>
 #include <string_view>
 
 enum class MediaHideMode : std::uint8_t {
