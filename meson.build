@@ -1317,6 +1317,7 @@ if build_tests
     'night_light_temperature_override',
     'niri_workspace_backend',
     'notification_dnd',
+    'notification_default_timeout',
     'notification_filter',
     'notification_history_dismiss',
     'notification_history_encryption',

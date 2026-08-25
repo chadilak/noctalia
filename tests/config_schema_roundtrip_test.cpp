@@ -397,6 +397,7 @@ location = "https://example.invalid/bad"
         .monitors = {"DP-2"},
         .collapseOnDismiss = false,
         .historyRetentionHours = 48,
+        .defaultTimeoutMs = 4500,
         .filters = {NotificationFilterConfig{
             .name = "discord",
             .enabled = true,
@@ -752,6 +753,14 @@ location = "https://example.invalid/bad"
       Diagnostics d;
       readInto(t, n, notificationSchema(), "notification", d);
       TEST_CHECK(n.width == static_cast<std::int32_t>(*kNotificationWidthRange.max));
+    }
+    // Notification toast duration ceiling: 60s is the longest server-default expiry.
+    {
+      auto t = toml::parse("default_timeout_ms = 90000");
+      NotificationConfig n{};
+      Diagnostics d;
+      readInto(t, n, notificationSchema(), "notification", d);
+      TEST_CHECK(n.defaultTimeoutMs == 60000);
     }
   }
 
