@@ -27,7 +27,7 @@ struct NotificationHistoryEntry {
   std::uint64_t eventSerial = 0;
 };
 
-constexpr int32_t kDefaultNotificationTimeout = 6000;
+constexpr int32_t kDefaultNotificationTimeout = kDefaultNotificationTimeoutMs;
 
 // Upper bound on action pairs (key + label) kept per notification. Enforced once at ingress
 // in addOrReplace(); render sites clamp defensively against the same value.
@@ -35,12 +35,13 @@ constexpr std::size_t kMaxNotificationActions = 6;
 
 // Freedesktop expire_timeout: 0 = persistent, -1 = server default, positive = milliseconds.
 // Normalize once at Notify ingress so manager timers and toast countdowns stay aligned.
-[[nodiscard]] inline int32_t normalizeNotifyExpireTimeout(int32_t expireTimeout) noexcept {
+[[nodiscard]] inline int32_t
+normalizeNotifyExpireTimeout(int32_t expireTimeout, int32_t serverDefault = kDefaultNotificationTimeout) noexcept {
   if (expireTimeout == 0) {
     return 0;
   }
   if (expireTimeout < 0) {
-    return kDefaultNotificationTimeout;
+    return serverDefault;
   }
   return expireTimeout;
 }
@@ -133,6 +134,9 @@ public:
   [[nodiscard]] const std::vector<NotificationFilterConfig>& filters() const noexcept;
   void setKeepDismissedInHistory(bool keep);
   void setHistoryRetentionHours(int hours);
+  // Server-default expiry for external notifications that don't carry an explicit timeout.
+  void setDefaultTimeoutMs(int32_t timeoutMs) noexcept;
+  [[nodiscard]] int32_t defaultTimeoutMs() const noexcept;
   void setDoNotDisturb(bool enabled);
   [[nodiscard]] bool doNotDisturb() const noexcept;
   [[nodiscard]] bool toggleDoNotDisturb();
@@ -176,6 +180,7 @@ private:
 
   int m_historyRetentionHours = 0;
   bool m_keepDismissedInHistory = true;
+  int32_t m_defaultTimeoutMs = kDefaultNotificationTimeoutMs;
   bool m_persistScheduled = false;
   Timer m_historyRetentionTimer;
 
