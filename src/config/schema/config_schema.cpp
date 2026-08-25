@@ -260,6 +260,7 @@ namespace noctalia::config::schema {
         field(&NotificationConfig::keepDismissedInHistory, "keep_dismissed_in_history"),
         field(&NotificationConfig::historyRetentionHours, "history_retention_hours", Range<std::int64_t>{0, 8760}),
         field(&NotificationConfig::maxVisible, "max_visible", Range<std::int64_t>{0, 20}),
+        field(&NotificationConfig::defaultTimeoutMs, "default_timeout_ms", Range<std::int64_t>{0, 60000}),
         custom<NotificationConfig>(
             "blacklist",
             [](const toml::table& tbl, NotificationConfig& out, std::string_view, Diagnostics&) {

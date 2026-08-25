@@ -726,12 +726,17 @@ void Application::initNotificationAndOsd() {
   auto applyDismissedHistory = [this]() {
     m_notificationManager.setKeepDismissedInHistory(m_configService.config().notification.keepDismissedInHistory);
   };
+  auto applyDefaultTimeout = [this]() {
+    m_notificationManager.setDefaultTimeoutMs(m_configService.config().notification.defaultTimeoutMs);
+  };
   applyDismissedHistory();
   m_configService.addReloadCallback(applyDismissedHistory);
   applyHistoryRetention();
   m_configService.addReloadCallback(applyHistoryRetention);
   applyNotificationFilterConfig();
   m_configService.addReloadCallback(applyNotificationFilterConfig);
+  applyDefaultTimeout();
+  m_configService.addReloadCallback(applyDefaultTimeout);
   m_configService.setNotificationManager(&m_notificationManager);
   m_notificationManager.setSoundPlayer(m_soundPlayer.get());
 
