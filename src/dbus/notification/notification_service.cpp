@@ -401,7 +401,7 @@ namespace notification_dbus {
       const std::string& summary, const std::string& body, const std::vector<std::string>& actions,
       const std::map<std::string, sdbus::Variant>& hints, int32_t expire_timeout
   ) {
-    const int32_t timeout = normalizeNotifyExpireTimeout(expire_timeout);
+    const int32_t timeout = normalizeNotifyExpireTimeout(expire_timeout, manager.defaultTimeoutMs());
     const auto sanitizedActions = sanitizeNotifyActions(actions);
 
     return manager.addOrReplace(
