@@ -1192,6 +1192,7 @@ if build_tests
     'network_manager_security',
     'niri_workspace_backend',
     'notification_dnd',
+    'notification_default_timeout',
     'notification_filter',
     'notification_history_dismiss',
     'notification_history_utf8',

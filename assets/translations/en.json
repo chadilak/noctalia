@@ -2264,6 +2264,10 @@
           "description": "Enable the built-in notification daemon",
           "label": "Notification Daemon"
         },
+        "default-timeout-ms": {
+          "description": "How long notification toasts stay on screen when the sender doesn't request a duration (0 keeps them until dismissed)",
+          "label": "Toast Duration"
+        },
         "filters": {
           "description": "Per-sender rules for toasts, history, and sounds; first matching enabled filter wins",
           "label": "Notification Filters"

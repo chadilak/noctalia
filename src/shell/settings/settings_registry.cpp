@@ -2916,6 +2916,18 @@ namespace settings {
         "maximum on-screen toasts count limit"
     ));
     entries.push_back(makeEntry(
+        SettingsSection::Notifications, "toasts", tr("settings.schema.notifications.default-timeout-ms.label"),
+        tr("settings.schema.notifications.default-timeout-ms.description"), {"notification", "default_timeout_ms"},
+        StepperSetting{
+            .value = cfg.notification.defaultTimeoutMs,
+            .minValue = 0,
+            .maxValue = 60000,
+            .step = 500,
+            .valueSuffix = "ms",
+        },
+        "toast duration timeout expiry milliseconds seconds dismiss"
+    ));
+    entries.push_back(makeEntry(
         SettingsSection::Notifications, "toasts", tr("settings.schema.notifications.toast-opacity.label"),
         tr("settings.schema.notifications.toast-opacity.description"), {"notification", "background_opacity"},
         sliderFor(cfg.notification.backgroundOpacity, noctalia::config::schema::kUnitRange, false), "popup"

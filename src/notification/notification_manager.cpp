@@ -269,12 +269,12 @@ uint32_t NotificationManager::addOrReplace(NotificationRequest request) {
   }
 
   if (dispatch.overrideDuration.has_value()) {
-    timeout = normalizeNotifyExpireTimeout(*dispatch.overrideDuration);
+    timeout = normalizeNotifyExpireTimeout(*dispatch.overrideDuration, m_defaultTimeoutMs);
   }
 
   // A matching filter with allow_permanent = false expires otherwise-permanent (timeout 0) notifications.
   if (timeout == 0 && dispatch.disallowPermanent) {
-    timeout = kDefaultNotificationTimeout;
+    timeout = m_defaultTimeoutMs;
   }
 
   if (replacesId != 0) {
@@ -710,6 +710,15 @@ void NotificationManager::setFilters(std::vector<NotificationFilterConfig> filte
 }
 
 const std::vector<NotificationFilterConfig>& NotificationManager::filters() const noexcept { return m_filters; }
+
+void NotificationManager::setDefaultTimeoutMs(int32_t timeoutMs) noexcept {
+  if (timeoutMs < 0) {
+    timeoutMs = kDefaultNotificationTimeout;
+  }
+  m_defaultTimeoutMs = timeoutMs;
+}
+
+int32_t NotificationManager::defaultTimeoutMs() const noexcept { return m_defaultTimeoutMs; }
 
 NotificationManager::ExternalNotificationDispatch NotificationManager::evaluateExternalDispatch(
     NotificationOrigin origin, Urgency urgency, std::string_view appName, const std::optional<std::string>& category,

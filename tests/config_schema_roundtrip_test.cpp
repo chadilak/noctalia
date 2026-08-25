@@ -381,6 +381,7 @@ location = "https://example.invalid/bad"
         .monitors = {"DP-2"},
         .collapseOnDismiss = false,
         .historyRetentionHours = 48,
+        .defaultTimeoutMs = 4500,
         .filters = {NotificationFilterConfig{
             .name = "discord",
             .enabled = true,
@@ -619,6 +620,16 @@ location = "https://example.invalid/bad"
       readInto(t, s, shellSchema(), "shell", d);
       if (s.clipboardHistoryMaxEntries != 10000) {
         fail("shell.clipboard_history_max_entries clamp: expected 10000");
+      }
+    }
+    // Notification toast duration ceiling: 60s is the longest server-default expiry.
+    {
+      auto t = toml::parse("default_timeout_ms = 90000");
+      NotificationConfig n{};
+      Diagnostics d;
+      readInto(t, n, notificationSchema(), "notification", d);
+      if (n.defaultTimeoutMs != 60000) {
+        fail("notification.default_timeout_ms clamp: expected 60000");
       }
     }
   }

@@ -740,6 +740,10 @@ struct OsdConfig {
   bool operator==(const OsdConfig&) const = default;
 };
 
+// Default toast duration for notifications that don't carry an explicit expire timeout, in
+// milliseconds. 0 keeps such toasts until dismissed (mirrors the freedesktop expire_timeout=0 rule).
+inline constexpr std::int32_t kDefaultNotificationTimeoutMs = 6000;
+
 struct NotificationConfig {
   bool enableDaemon = true;
   bool showAppName = true;
@@ -755,6 +759,7 @@ struct NotificationConfig {
   bool collapseOnDismiss = true;
   int historyRetentionHours = 0;
   int maxVisible = 0; // 0 = unlimited (space-based only)
+  int defaultTimeoutMs = kDefaultNotificationTimeoutMs;
 
   std::vector<NotificationFilterConfig> filters;
 
